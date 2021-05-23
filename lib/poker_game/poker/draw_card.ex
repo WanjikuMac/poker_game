@@ -35,7 +35,7 @@ defmodule PokerGame.DrawCard do
   def pair_rank_diff_values(%{black: cards_a, white: cards_b}) do
     {player, card, _index} =
       Enum.max_by(
-        [diff_value_pair({cards_a, "black"}), diff_value_pair({cards_b, "white"})],
+        List.flatten([diff_value_pair({cards_a, "black"}), diff_value_pair({cards_b, "white"})]),
         fn {_player, _card, index} -> index end
       )
 
@@ -50,7 +50,7 @@ defmodule PokerGame.DrawCard do
   # Todo review this function later
   def same_value_pair(%{black: cards_a, white: cards_b}) do
     # Add check to ensure values are the same
-    [h | _] = List.flatten([return_duplicate_value(cards_a), return_duplicate_value(cards_b)])
+    [h, _] = [return_duplicate_value(cards_a), return_duplicate_value(cards_b)]
     new_card_a = drop_duplicates({cards_a, h})
     new_card_b = drop_duplicates({cards_b, h})
 
@@ -145,7 +145,7 @@ defmodule PokerGame.DrawCard do
         index
       end)
 
-    "#{player} wins - Straight: #{name(card)}"
+    "#{player} wins - Straight Flush: #{name(card)}"
   end
 
   # FULL HOUSE
