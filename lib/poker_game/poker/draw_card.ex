@@ -1,18 +1,17 @@
 defmodule PokerGame.DrawCard do
   require Logger
   @cards ~w(2 3 4 5 6 7 8 9 T J Q K A)
-  # define the data structure
+
   defstruct [:black, :white]
 
-  # create constructor
-  # A hand only contains 5 cards
   def new(cards_a, cards_b) do
     %__MODULE__{black: cards_a, white: cards_b}
   end
 
   # HIGH CARD AND FLUSH RANKING
-  # create convertor for high card
   def high_card(%{black: cards_a, white: cards_b}) do
+    {cards_a, cards_b} = drop_high_card_dup(cards_a, cards_b)
+
     {player, card, _index} =
       Enum.max_by([high_card({cards_a, "black"}), high_card({cards_b, "white"})], fn {_player,
                                                                                       _card,
@@ -23,16 +22,20 @@ defmodule PokerGame.DrawCard do
     "#{player} wins - high card: #{name(card)}"
   end
 
-  # create reducer for high card ranking 
-  def high_card({cards, player}) when is_list(cards) do
+  def high_card({cards, player}) do
     result = return_cards_values(cards)
-    # use max_by
+
     {card, index} = Enum.filter(ranked_cards(), fn {card, _y} -> card in result end) |> Enum.max()
     {player, card, index}
   end
 
-  # ranking order of pair 
-  def pair_rank_diff_values(%{black: cards_a, white: cards_b}) do
+  def drop_high_card_dup(cards_a, cards_b) do
+    result = Enum.filter(cards_a, fn x -> x in cards_b end)
+    {cards_a -- result, cards_b -- result}
+  end
+
+  # PAIR RANK 
+  def pair_card(%{black: cards_a, white: cards_b}) do
     {player, card, _index} =
       Enum.max_by(
         List.flatten([diff_value_pair({cards_a, "black"}), diff_value_pair({cards_b, "white"})]),
@@ -47,9 +50,7 @@ defmodule PokerGame.DrawCard do
     |> Enum.map(fn {card, index} -> {player, card, index} end)
   end
 
-  # Todo review this function later
   def same_value_pair(%{black: cards_a, white: cards_b}) do
-    # Add check to ensure values are the same
     [h, _] = [return_duplicate_value(cards_a), return_duplicate_value(cards_b)]
     new_card_a = drop_duplicates({cards_a, h})
     new_card_b = drop_duplicates({cards_b, h})
@@ -109,7 +110,6 @@ defmodule PokerGame.DrawCard do
   end
 
   # STRAIGHT Hand contains 5 cards with consecutive values.
-  # TODO Add check to ensure the cards are consecutive
   def straight(%{black: cards_a, white: cards_b}) do
     {player, card, _index} =
       Enum.max_by([high_card({cards_a, "black"}), high_card({cards_b, "white"})], fn {_player,
@@ -136,7 +136,6 @@ defmodule PokerGame.DrawCard do
   end
 
   # STRAIGHT FLUSH
-  # TODO Add check to ensure the cards are consecutive
   def straight_flush(%{black: cards_a, white: cards_b}) do
     {player, card, _index} =
       Enum.max_by([high_card({cards_a, "black"}), high_card({cards_b, "white"})], fn {_player,
