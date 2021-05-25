@@ -8,6 +8,35 @@ defmodule PokerGame.DrawCard do
     %__MODULE__{black: cards_a, white: cards_b}
   end
 
+  def category([{_value, suit} | tail] = cards) do
+    if Enum.all(tail, fn {_v, s} -> s == suit end) do
+      "flush"
+    else
+      count =
+        cards
+        |> Enum.map(fn x -> elem(x, 0) end)
+        |> Enum.group_by(& &1)
+        |> Enum.map(fn {x, _} -> x end)
+        |> Enum.count()
+
+      if count == 4 do
+        "pair"
+      else
+        "three of a kind"
+      end
+    end
+  end
+
+  def category(cards) do
+    cards
+    |> Enum.map(fn x -> String.split_at(x, 1) end)
+    |> category()
+
+    # |> Enum.count()
+
+    # if count == 1, do: "flush"
+  end
+
   # HIGH CARD AND FLUSH RANKING
   def high_card(%{black: cards_a, white: cards_b}) do
     {cards_a, cards_b} = drop_high_card_dup(cards_a, cards_b)
