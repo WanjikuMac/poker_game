@@ -9,7 +9,7 @@ defmodule PokerGame.DrawCard do
   end
 
   def category([{_value, suit} | tail] = cards) do
-    if Enum.all(tail, fn {_v, s} -> s == suit end) do
+    if Enum.all?(tail, fn {_v, s} -> s == suit end) do
       "flush"
     else
       count =
