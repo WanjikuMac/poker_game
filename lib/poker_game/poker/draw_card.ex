@@ -8,35 +8,6 @@ defmodule PokerGame.DrawCard do
     %__MODULE__{black: cards_a, white: cards_b}
   end
 
-  def category([{_value, suit} | tail] = cards) do
-    if Enum.all?(tail, fn {_v, s} -> s == suit end) do
-      "flush"
-    else
-      count =
-        cards
-        |> Enum.map(fn x -> elem(x, 0) end)
-        |> Enum.group_by(& &1)
-        |> Enum.map(fn {x, _} -> x end)
-        |> Enum.count()
-
-      if count == 4 do
-        "pair"
-      else
-        "three of a kind"
-      end
-    end
-  end
-
-  def category(cards) do
-    cards
-    |> Enum.map(fn x -> String.split_at(x, 1) end)
-    |> category()
-
-    # |> Enum.count()
-
-    # if count == 1, do: "flush"
-  end
-
   # HIGH CARD AND FLUSH RANKING
   def high_card(%{black: cards_a, white: cards_b}) do
     {cards_a, cards_b} = drop_high_card_dup(cards_a, cards_b)
@@ -190,32 +161,32 @@ defmodule PokerGame.DrawCard do
     "#{player} wins - Full House: #{name(card)}"
   end
 
-  def drop_duplicates({cards, dup_card}) when is_list(cards) do
+  defp drop_duplicates({cards, dup_card}) when is_list(cards) do
     return_cards_values(cards)
     |> Enum.filter(fn x -> x not in dup_card end)
   end
 
-  def return_three_duplicate_value(cards) do
+  defp return_three_duplicate_value(cards) do
     return_cards_values(cards)
     |> Enum.group_by(& &1)
     |> Enum.filter(fn x -> match?({_, [_, _, _]}, x) end)
     |> Enum.map(fn {x, _} -> x end)
   end
 
-  def return_duplicate_value(cards) when is_list(cards) do
+  defp return_duplicate_value(cards) when is_list(cards) do
     return_cards_values(cards)
     |> Enum.group_by(& &1)
     |> Enum.filter(fn x -> match?({_, [_, _ | _]}, x) end)
     |> Enum.map(fn {x, _} -> x end)
   end
 
-  def return_cards_values(cards) do
+  defp return_cards_values(cards) do
     cards
     |> Enum.map(fn x -> String.split_at(x, 1) end)
     |> Enum.map(fn x -> elem(x, 0) end)
   end
 
-  def ranked_cards() do
+  defp ranked_cards() do
     Enum.zip(@cards, 1..13)
   end
 
