@@ -161,32 +161,32 @@ defmodule PokerGame.DrawCard do
     "#{player} wins - Full House: #{name(card)}"
   end
 
-  def drop_duplicates({cards, dup_card}) when is_list(cards) do
+  defp drop_duplicates({cards, dup_card}) when is_list(cards) do
     return_cards_values(cards)
     |> Enum.filter(fn x -> x not in dup_card end)
   end
 
-  def return_three_duplicate_value(cards) do
+  defp return_three_duplicate_value(cards) do
     return_cards_values(cards)
     |> Enum.group_by(& &1)
     |> Enum.filter(fn x -> match?({_, [_, _, _]}, x) end)
     |> Enum.map(fn {x, _} -> x end)
   end
 
-  def return_duplicate_value(cards) when is_list(cards) do
+  defp return_duplicate_value(cards) when is_list(cards) do
     return_cards_values(cards)
     |> Enum.group_by(& &1)
     |> Enum.filter(fn x -> match?({_, [_, _ | _]}, x) end)
     |> Enum.map(fn {x, _} -> x end)
   end
 
-  def return_cards_values(cards) do
+  defp return_cards_values(cards) do
     cards
     |> Enum.map(fn x -> String.split_at(x, 1) end)
     |> Enum.map(fn x -> elem(x, 0) end)
   end
 
-  def ranked_cards() do
+  defp ranked_cards() do
     Enum.zip(@cards, 1..13)
   end
 
